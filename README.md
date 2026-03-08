@@ -23,7 +23,7 @@ FileChangeDetection/
 ├── traverse.c/.h   # Directory traversal logic
 ├── utils.c/.h      # Snapshot I/O, comparison, and stat output
 ├── types.h         # Shared type definitions
-└── extern/         # External dependency: argtable3
+└── extern/         # External dependency: argtable3 and uthash
 ```
 
 ---
@@ -34,7 +34,7 @@ FileChangeDetection/
 
 - Windows (the project uses `windows.h` and Windows-specific APIs)
 - MSVC (primary target) or MinGW
-- The `argtable3` library is bundled in `extern/`
+- The `argtable3` and `uthash` are bundled in `extern/`
 
 ### Build
 
@@ -92,14 +92,6 @@ The tool is entirely manual — there is no background process or polling loop. 
 3. **Compare only** — Run with `-c` and a snapshot file to compare two previously saved snapshots without doing a live scan
 
 Comparison uses hash tables for efficient path lookups. Diff output (added/deleted entries) can be printed to the console with `-d` and/or written to a file with `-w`.
-
----
-
-## Roadmap
-
-- [ ] Linux/macOS support (currently Windows-only via `windows.h`)
-- [ ] Detect file modifications (size/timestamp changes), not just additions and deletions
-- [ ] Human-readable export format option
 
 ---
 
