@@ -1,23 +1,108 @@
-# FileChangeDetection
+# 🔍 FileChangeDetection
 
-## Overview
-FileChangeDetection is a C application that monitors specified directories or files for any changes. It efficiently detects modifications, additions, or deletions in real-time, making it useful for tasks like logging changes, automating backups, or triggering other processes in response to file system events.
+A lightweight Windows CLI tool written in C that snapshots a directory tree and compares it against a previously saved snapshot to detect added, modified, or deleted files.
+
+---
 
 ## Features
-- **Real-Time Monitoring**: Continuously monitors directories or files for any changes.
-- **Event Detection**: Captures and logs events such as file creation, modification, and deletion.
-- **Lightweight and Efficient**: Designed to run with minimal resource usage.
-- **Cross-Platform Compatibility**: Built in C, making it portable across different operating systems.
 
-## How to Run
-1. Clone the repository and navigate to the project directory.
-2. Compile the project using a C compiler.
-3. Run the application, specifying the directory or file to monitor.
+- **Directory traversal** — Recursively walks a directory tree and records its structure
+- **Snapshot saving** — Persists a directory snapshot to a custom binary file with `-o` for later comparison
+- **Manual diffing** — Compare a live directory scan against any saved snapshot file
+- **Diff reporting** — Optionally show added/deleted files (`-d`) and write results to a file (`-w`)
+- **O(n) comparison** — Uses hash tables for path lookups, so diffing two snapshots scales linearly with the number of entries
+- **Modular design** — Logic cleanly split across `traverse`, `utils`, and `types` modules
 
-## Future Improvements
-- Add support for recursive directory monitoring.
-- Implement more detailed logging and reporting features.
-- Create a user-friendly GUI for easier configuration and management.
+---
+
+## Project Structure
+
+```
+FileChangeDetection/
+├── main.c          # Entry point & CLI argument handling (argtable3)
+├── traverse.c/.h   # Directory traversal logic
+├── utils.c/.h      # Snapshot I/O, comparison, and stat output
+├── types.h         # Shared type definitions
+└── extern/         # External dependency: argtable3
+```
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- Windows (the project uses `windows.h` and Windows-specific APIs)
+- MSVC (primary target) or MinGW
+- The `argtable3` library is bundled in `extern/`
+
+### Build
+
+```bash
+git clone https://github.com/TheEugen/FileChangeDetection.git
+cd FileChangeDetection
+```
+
+Open the project in Visual Studio, or compile manually with your preferred Windows C toolchain. Make sure `extern/argtable3.h` and its corresponding source file are included in your build.
+
+---
+
+## Usage
+
+```
+FileChangeDetection <dir> [options]
+```
+
+| Flag | Description |
+|------|-------------|
+| `<dir>` | Directory to scan |
+| `-o <saveFile>` | Save the scanned directory structure to a binary snapshot file |
+| `<file>` | Snapshot file to compare against |
+| `-c` | Compare only (load both snapshots from files, no live scan) |
+| `-d` | Show added and deleted files/directories in the diff |
+| `-w <file>` | Write diff results to a file |
+| `--help` | Display usage information |
+| `--version` | Display version info |
+
+### Examples
+
+**Take a snapshot:**
+```bash
+FileChangeDetection C:\MyFolder -o snapshot.dat
+```
+
+**Compare current state against a snapshot:**
+```bash
+FileChangeDetection C:\MyFolder snapshot.dat -d
+```
+
+**Compare two saved snapshots (no live scan):**
+```bash
+FileChangeDetection C:\MyFolder -c snapshot.dat -d -w diff_output.txt
+```
+
+---
+
+## How It Works
+
+The tool is entirely manual — there is no background process or polling loop. You control when snapshots are taken and compared:
+
+1. **Scan & save** — Run with `-o` to traverse a directory and serialize its structure to a custom binary file (storing root path, total size, file count, per-file name/path/size/last-write time, and directory entries)
+2. **Scan & compare** — Run with a snapshot file to traverse the directory again and immediately diff the live state against the saved snapshot
+3. **Compare only** — Run with `-c` and a snapshot file to compare two previously saved snapshots without doing a live scan
+
+Comparison uses hash tables for efficient path lookups. Diff output (added/deleted entries) can be printed to the console with `-d` and/or written to a file with `-w`.
+
+---
+
+## Roadmap
+
+- [ ] Linux/macOS support (currently Windows-only via `windows.h`)
+- [ ] Detect file modifications (size/timestamp changes), not just additions and deletions
+- [ ] Human-readable export format option
+
+---
 
 ## License
-This project is licensed under the MIT License.
+
+This project is licensed under the [MIT License](LICENSE).
