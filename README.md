@@ -92,3 +92,16 @@ The tool is entirely manual — there is no background process or polling loop. 
 3. **Compare only** — Run with `-c` and a snapshot file to compare two previously saved snapshots without doing a live scan
 
 Comparison uses hash tables for efficient path lookups. Diff output (added/deleted entries) can be printed to the console with `-d` and/or written to a file with `-w`.
+
+---
+
+## License
+
+Source-available under the [PolyForm Noncommercial License 1.0.0](LICENSE).
+You may use, modify and share this code for noncommercial purposes (personal use, hobby projects, research, education).
+**Commercial use requires a separate license.** Contact: fehandke@gmail.com
+
+Text and data mining for commercial purposes, including using this code to train AI models, is expressly reserved
+(§ 44b UrhG, Art. 4(3) Directive (EU) 2019/790).
+
+The files in `extern/` (argtable3, uthash) are third-party code under their own BSD licenses (see the file headers) and are not covered by this license.
